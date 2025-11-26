@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 import pandas as pd
 from analysis import (
     load_dataset, clean_macronutrients, calculate_average_macros,
@@ -11,74 +11,85 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     """Render the main dashboard page."""
-    return render_template('index.html')  
+    return render_template('index.html')
 
-# ---------------------- RECIPE SEARCH API ----------------------
 
-# Simple built-in recipe dictionary
+# ---------------------- RECIPE SEARCH API (NEW) ----------------------
+
 RECIPES = {
     "chicken": {
         "title": "Simple Baked Chicken Breast",
+        "description": "Easy oven-baked chicken breast with basic seasoning.",
         "ingredients": [
             "2 chicken breasts",
             "1 tbsp olive oil",
             "1 tsp salt",
-            "1 tsp black pepper",
+            "1/2 tsp black pepper",
             "1 tsp garlic powder",
             "1 tsp paprika"
         ],
         "steps": [
             "Preheat oven to 400°F (200°C).",
-            "Rub chicken with olive oil and seasonings.",
-            "Bake 20–25 minutes until 165°F (74°C).",
-            "Rest 5 minutes before slicing."
+            "Pat the chicken dry and rub with olive oil.",
+            "Season both sides with salt, pepper, garlic powder, and paprika.",
+            "Bake for 20–25 minutes or until internal temperature reaches 165°F (74°C).",
+            "Rest for 5 minutes, then slice and serve."
         ]
     },
     "oats": {
-        "title": "Warm Oatmeal Bowl",
+        "title": "Basic Oatmeal Breakfast Bowl",
+        "description": "Warm oats with fruit and nuts.",
         "ingredients": [
             "1/2 cup rolled oats",
             "1 cup water or milk",
-            "1 tbsp honey",
-            "Banana slices",
-            "Berries or nuts"
+            "Pinch of salt",
+            "1 tbsp honey or maple syrup",
+            "1/2 banana, sliced",
+            "Handful of berries or nuts"
         ],
         "steps": [
-            "Add oats + liquid to pot.",
-            "Simmer 5–7 minutes.",
-            "Transfer to bowl.",
-            "Top with banana, berries, nuts, and honey."
+            "Add oats, liquid, and salt to a small pot.",
+            "Bring to a boil, then reduce to low and simmer 5–7 minutes, stirring.",
+            "Pour into a bowl and top with banana, berries, and nuts.",
+            "Drizzle with honey or maple syrup."
         ]
     },
     "salad": {
-        "title": "Fresh Mixed Green Salad",
+        "title": "Simple Mixed Green Salad",
+        "description": "Quick salad with basic dressing.",
         "ingredients": [
             "2 cups mixed greens",
-            "Cherry tomatoes",
-            "Cucumber",
+            "5 cherry tomatoes, halved",
+            "1/4 cucumber, sliced",
             "1 tbsp olive oil",
-            "1 tsp lemon juice",
-            "Salt & pepper"
+            "1 tsp lemon juice or vinegar",
+            "Salt and pepper"
         ],
         "steps": [
-            "Add greens and vegetables to bowl.",
-            "Whisk lemon, oil, salt, pepper.",
-            "Pour dressing and toss."
+            "Add greens, tomatoes, and cucumber to a bowl.",
+            "In a small bowl, whisk olive oil, lemon/vinegar, salt and pepper.",
+            "Pour dressing over the salad and toss gently.",
+            "Serve immediately."
         ]
     }
 }
 
 @app.route('/api/recipe')
-def recipe_api():
-    query = request.args.get("q", "").lower().strip()
+def get_recipe():
+    """Return a simple recipe based on a food keyword in the search."""
+    query = request.args.get("q", "").strip().lower()
     if not query:
-        return jsonify({"found": False, "message": "Please type something."})
+        return jsonify({"found": False, "message": "Please type a food name."})
 
-    for key, recipe in RECIPES.items():
-        if key in query:
+    # basic keyword match
+    for keyword, recipe in RECIPES.items():
+        if keyword in query:
             return jsonify({"found": True, "recipe": recipe})
 
     return jsonify({"found": False, "message": "No recipe found for that food."})
+
+
+# ---------------------- EXISTING APIs (UNCHANGED) ----------------------
 
 @app.route('/api/avg_macros')
 def avg_macros_api():
