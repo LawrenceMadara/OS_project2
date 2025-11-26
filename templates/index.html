@@ -4,226 +4,472 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nutritional Insights</title>
-
-    <!-- Tailwind -->
+    <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
-
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 </head>
 
 <body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="bg-blue-600 p-4 text-white">
+        <h1 class="text-3xl font-semibold text-center">Nutritional Insights Dashboard</h1>
+    </header>
 
-<header class="bg-blue-600 p-4 text-white">
-    <h1 class="text-3xl font-semibold text-center">Nutritional Insights Dashboard</h1>
-</header>
+    <!-- Main Content -->
+    <main class="container mx-auto p-6">
+        <!-- Overview Section -->
+        <section class="mb-10">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Explore Nutritional Insights</h2>
 
-<main class="container mx-auto p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-    <!-- Search Bar + Filters -->
-    <section class="mb-10">
-        <h2 class="text-2xl font-semibold mb-4 text-gray-800">Search for Food Recipe</h2>
+                <!-- Protein Bar Chart -->
+                <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
+                    <h3 class="font-semibold mb-2">Protein Bar Chart</h3>
+                    <p class="text-sm text-gray-600 mb-2 text-center">
+                        Average Protein content by Diet Type
+                    </p>
+                    <canvas id="proteinChart" class="w-full" style="max-height: 200px;"></canvas>
+                </div>
 
-        <div class="flex flex-wrap gap-4 mb-4">
-            <input id="searchInput"
-                   class="p-2 border rounded w-full sm:w-auto"
-                   placeholder="Type a food (example: chicken, oats, salad)">
-        </div>
+                <!-- Carbs Bar Chart -->
+                <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
+                    <h3 class="font-semibold mb-2">Carbs Bar Chart</h3>
+                    <p class="text-sm text-gray-600 mb-2 text-center">
+                        Average Carbohydrates by Diet Type
+                    </p>
+                    <canvas id="carbsChart" class="w-full" style="max-height: 200px;"></canvas>
+                </div>
 
-        <!-- Recipe Result -->
-        <div id="recipeResult" class="bg-white p-4 shadow rounded hidden">
-            <h3 class="text-xl font-semibold mb-2">Recipe Result</h3>
-            <div id="recipeContent" class="text-gray-800"></div>
-        </div>
-    </section>
+                <!-- Fat Bar Chart -->
+                <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
+                    <h3 class="font-semibold mb-2">Fat Bar Chart</h3>
+                    <p class="text-sm text-gray-600 mb-2 text-center">
+                        Average Fat content by Diet Type
+                    </p>
+                    <canvas id="fatChart" class="w-full" style="max-height: 200px;"></canvas>
+                </div>
 
+                <!-- Heatmap (using grouped bar chart) -->
+                <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
+                    <h3 class="font-semibold mb-2">Macronutrient Overview</h3>
+                    <p class="text-sm text-gray-600 mb-2 text-center">
+                        All Macronutrients by Diet Type
+                    </p>
+                    <canvas id="heatmapChart" class="w-full" style="max-height: 200px;"></canvas>
+                </div>
+            </div>
+        </section>
 
-    <!-- Existing Charts -->
-    <section class="mb-10">
-        <h2 class="text-2xl font-semibold mb-4 text-gray-800">Explore Nutritional Insights</h2>
+        <!-- Scatter Plot Section -->
+        <section class="mb-10">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Top Protein-Rich Recipes</h2>
+            <div class="bg-white p-6 shadow-lg rounded-lg flex flex-col items-center">
+                <p class="text-sm text-gray-600 mb-2 text-center">
+                    Top 5 protein-rich recipes per diet type
+                </p>
+                <canvas id="topProteinChart" style="max-height: 400px;"></canvas>
+            </div>
+        </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Controls Section -->
+        <section class="mb-10">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Data Interaction</h2>
 
-            <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
-                <h3 class="font-semibold mb-2">Protein Bar Chart</h3>
-                <canvas id="proteinChart" style="max-height: 200px;"></canvas>
+            <div class="flex flex-wrap gap-4 mb-6">
+                <input type="text" id="searchInput" placeholder="Search by Diet Type or Food (e.g. chicken, oats, salad)"
+                       class="p-2 border rounded w-full sm:w-auto focus:ring focus:ring-blue-300">
+
+                <select id="dietFilter" class="p-2 border rounded w-full sm:w-auto focus:ring focus:ring-blue-300">
+                    <option value="all">All Diet Types</option>
+                    <option value="Vegan">Vegan</option>
+                    <option value="Keto">Keto</option>
+                    <option value="Paleo">Paleo</option>
+                    <option value="Vegetarian">Vegetarian</option>
+                </select>
+
+                <!-- Button to refresh charts -->
+                <button id="refreshBtn"
+                        class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
+                    🔄 Refresh Charts
+                </button>
             </div>
 
-            <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
-                <h3 class="font-semibold mb-2">Carbs Bar Chart</h3>
-                <canvas id="carbsChart" style="max-height: 200px;"></canvas>
+            <div id="statusMessage" class="text-gray-700"></div>
+
+            <!-- Recipe Search Result (NEW) -->
+            <div id="recipeResult" class="mt-4 bg-white p-4 shadow rounded hidden">
+                <h3 class="text-xl font-semibold mb-2">Recipe Result</h3>
+                <div id="recipeContent" class="text-gray-800 text-sm"></div>
             </div>
+        </section>
 
-            <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
-                <h3 class="font-semibold mb-2">Fat Bar Chart</h3>
-                <canvas id="fatChart" style="max-height: 200px;"></canvas>
-            </div>
+    </main>
 
-            <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
-                <h3 class="font-semibold mb-2">Macronutrient Overview</h3>
-                <canvas id="heatmapChart" style="max-height: 200px;"></canvas>
-            </div>
-        </div>
-    </section>
+    <!-- Footer -->
+    <footer class="bg-blue-600 p-4 text-white text-center mt-10">
+        <p>&copy; 2025 Nutritional Insights. All Rights Reserved.</p>
+    </footer>
 
-    <section class="mb-10">
-        <h2 class="text-2xl font-semibold mb-4 text-gray-800">Top Protein Recipes</h2>
-        <div class="bg-white p-6 shadow-lg rounded-lg flex flex-col items-center">
-            <canvas id="topProteinChart" style="max-height: 400px;"></canvas>
-        </div>
-    </section>
+    <!-- JavaScript for Charts -->
+    <script>
+        // Store chart instances globally
+        let charts = {
+            protein: null,
+            carbs: null,
+            fat: null,
+            heatmap: null,
+            topProtein: null
+        };
 
-</main>
+        // Color palette for different diet types
+        const dietColors = {
+            'Vegan': 'rgba(34, 139, 34, 0.7)',
+            'Keto': 'rgba(255, 99, 132, 0.7)',
+            'Paleo': 'rgba(255, 159, 64, 0.7)',
+            'Vegetarian': 'rgba(75, 192, 192, 0.7)',
+            'Dash': 'rgba(153, 102, 255, 0.7)',
+            'Mediterranean': 'rgba(54, 162, 235, 0.7)'
+        };
 
-<footer class="bg-blue-600 p-4 text-white text-center mt-10">
-    <p>&copy; 2025 Nutritional Insights</p>
-</footer>
-
-
-<!-- JS -->
-<script>
-    // ---------------------- SEARCH RECIPE ----------------------
-    document.getElementById("searchInput").addEventListener("keypress", async function (e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-
-            const query = this.value.trim();
-            const resultDiv = document.getElementById("recipeResult");
-            const contentDiv = document.getElementById("recipeContent");
-
-            if (!query) {
-                resultDiv.classList.remove("hidden");
-                contentDiv.innerHTML = "<p>Please type a food item.</p>";
-                return;
+        // Common chart options
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
             }
+        };
 
-            const res = await fetch(`/api/recipe?q=${encodeURIComponent(query)}`);
-            const data = await res.json();
+        // Initialize all charts
+        async function initCharts() {
+            try {
+                const avgMacrosData = await fetch('/api/avg_macros').then(r => r.json());
+                const topProteinData = await fetch('/api/top_protein').then(r => r.json());
 
-            resultDiv.classList.remove("hidden");
-
-            if (!data.found) {
-                contentDiv.innerHTML = `<p class='text-red-600'>${data.message}</p>`;
-                return;
+                createProteinChart(avgMacrosData);
+                createCarbsChart(avgMacrosData);
+                createFatChart(avgMacrosData);
+                createHeatmapChart(avgMacrosData);
+                createTopProteinChart(topProteinData);
+            } catch (error) {
+                console.error('Error loading chart data:', error);
+                document.getElementById('statusMessage').textContent = '❌ Error loading data';
             }
-
-            const r = data.recipe;
-
-            contentDiv.innerHTML = `
-                <h4 class="text-lg font-bold mb-2">${r.title}</h4>
-
-                <h5 class="font-semibold">Ingredients:</h5>
-                <ul class="list-disc ml-6 mb-3">
-                    ${r.ingredients.map(i => `<li>${i}</li>`).join("")}
-                </ul>
-
-                <h5 class="font-semibold">Steps:</h5>
-                <ol class="list-decimal ml-6">
-                    ${r.steps.map(s => `<li>${s}</li>`).join("")}
-                </ol>
-            `;
         }
-    });
 
+        // Create Protein Bar Chart
+        function createProteinChart(data) {
+            const ctx = document.getElementById('proteinChart').getContext('2d');
+            
+            if (charts.protein) charts.protein.destroy();
 
-    // ---------------------- EXISTING CHARTS ----------------------
-    let charts = { protein:null, carbs:null, fat:null, heatmap:null, topProtein:null };
+            charts.protein = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.Diet_type),
+                    datasets: [{
+                        label: 'Protein (g)',
+                        data: data.map(d => d['Protein(g)']),
+                        backgroundColor: data.map(d => dietColors[d.Diet_type] || 'rgba(54, 162, 235, 0.7)'),
+                        borderColor: data.map(d => dietColors[d.Diet_type]?.replace('0.7', '1') || 'rgba(54, 162, 235, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Protein (g)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-    const dietColors = {
-        'Vegan':'rgba(34,139,34,0.7)',
-        'Keto':'rgba(255,99,132,0.7)',
-        'Paleo':'rgba(255,159,64,0.7)',
-        'Vegetarian':'rgba(75,192,192,0.7)',
-        'Dash':'rgba(153,102,255,0.7)',
-        'Mediterranean':'rgba(54,162,235,0.7)'
-    };
+        // Create Carbs Bar Chart
+        function createCarbsChart(data) {
+            const ctx = document.getElementById('carbsChart').getContext('2d');
+            
+            if (charts.carbs) charts.carbs.destroy();
 
-    const commonOptions = {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}};
+            charts.carbs = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.Diet_type),
+                    datasets: [{
+                        label: 'Carbs (g)',
+                        data: data.map(d => d['Carbs(g)']),
+                        backgroundColor: data.map(d => dietColors[d.Diet_type] || 'rgba(255, 159, 64, 0.7)'),
+                        borderColor: data.map(d => dietColors[d.Diet_type]?.replace('0.7', '1') || 'rgba(255, 159, 64, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Carbs (g)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-    async function initCharts() {
-        const avgMacros = await fetch('/api/avg_macros').then(r => r.json());
-        const topProtein = await fetch('/api/top_protein').then(r => r.json());
+        // Create Fat Bar Chart
+        function createFatChart(data) {
+            const ctx = document.getElementById('fatChart').getContext('2d');
+            
+            if (charts.fat) charts.fat.destroy();
 
-        createProteinChart(avgMacros);
-        createCarbsChart(avgMacros);
-        createFatChart(avgMacros);
-        createHeatmapChart(avgMacros);
-        createTopProteinChart(topProtein);
-    }
+            charts.fat = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.Diet_type),
+                    datasets: [{
+                        label: 'Fat (g)',
+                        data: data.map(d => d['Fat(g)']),
+                        backgroundColor: data.map(d => dietColors[d.Diet_type] || 'rgba(153, 102, 255, 0.7)'),
+                        borderColor: data.map(d => dietColors[d.Diet_type]?.replace('0.7', '1') || 'rgba(153, 102, 255, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Fat (g)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-    function createProteinChart(data) {
-        const ctx = document.getElementById('proteinChart');
-        if (charts.protein) charts.protein.destroy();
-        charts.protein = new Chart(ctx, {
-            type:'bar',
-            data:{
-                labels:data.map(d=>d.Diet_type),
-                datasets:[{data:data.map(d=>d['Protein(g)']), backgroundColor:'rgba(34,139,34,0.7)'}]
-            },
-            options:commonOptions
+        // Create Heatmap (Grouped Bar Chart)
+        function createHeatmapChart(data) {
+            const ctx = document.getElementById('heatmapChart').getContext('2d');
+            
+            if (charts.heatmap) charts.heatmap.destroy();
+
+            charts.heatmap = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.Diet_type),
+                    datasets: [
+                        {
+                            label: 'Protein',
+                            data: data.map(d => d['Protein(g)']),
+                            backgroundColor: 'rgba(34, 139, 34, 0.7)',
+                            borderColor: 'rgba(34, 139, 34, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Carbs',
+                            data: data.map(d => d['Carbs(g)']),
+                            backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Fat',
+                            data: data.map(d => d['Fat(g)']),
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Grams'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create Top Protein Scatter/Bubble Chart
+        function createTopProteinChart(data) {
+            const ctx = document.getElementById('topProteinChart').getContext('2d');
+            
+            if (charts.topProtein) charts.topProtein.destroy();
+
+            // Group data by diet type
+            const dietGroups = {};
+            data.forEach(item => {
+                if (!dietGroups[item.Diet_type]) {
+                    dietGroups[item.Diet_type] = [];
+                }
+                dietGroups[item.Diet_type].push(item);
+            });
+
+            // Create datasets for each diet type
+            const datasets = Object.keys(dietGroups).map(diet => ({
+                label: diet,
+                data: dietGroups[diet].map((item, index) => ({
+                    x: index + 1,
+                    y: item['Protein(g)'],
+                    recipe: item.Recipe_name,
+                    cuisine: item.Cuisine_type
+                })),
+                backgroundColor: dietColors[diet] || 'rgba(54, 162, 235, 0.7)',
+                borderColor: dietColors[diet]?.replace('0.7', '1') || 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }));
+
+            charts.topProtein = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const item = context.raw;
+                                    return [
+                                        `Recipe: ${item.recipe}`,
+                                        `Protein: ${item.y}g`,
+                                        `Cuisine: ${item.cuisine || 'N/A'}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Rank (Top 5 per Diet)'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Protein (g)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Refresh button functionality
+        document.getElementById('refreshBtn').addEventListener('click', async () => {
+            const status = document.getElementById('statusMessage');
+            status.textContent = 'Refreshing charts...';
+            try {
+                await initCharts();
+                status.textContent = '✅ Charts refreshed!';
+                setTimeout(() => status.textContent = '', 3000);
+            } catch (e) {
+                status.textContent = '❌ Failed to refresh charts.';
+                console.error(e);
+            }
         });
-    }
 
-    function createCarbsChart(data) {
-        const ctx=document.getElementById('carbsChart');
-        if(charts.carbs) charts.carbs.destroy();
-        charts.carbs=new Chart(ctx,{
-            type:'bar',
-            data:{labels:data.map(d=>d.Diet_type),datasets:[{data:data.map(d=>d['Carbs(g)']),backgroundColor:'rgba(255,159,64,0.7)'}]},
-            options:commonOptions
-        });
-    }
-
-    function createFatChart(data) {
-        const ctx=document.getElementById('fatChart');
-        if(charts.fat) charts.fat.destroy();
-        charts.fat=new Chart(ctx,{
-            type:'bar',
-            data:{labels:data.map(d=>d.Diet_type),datasets:[{data:data.map(d=>d['Fat(g)']),backgroundColor:'rgba(153,102,255,0.7)'}]},
-            options:commonOptions
-        });
-    }
-
-    function createHeatmapChart(data){
-        const ctx=document.getElementById('heatmapChart');
-        if(charts.heatmap) charts.heatmap.destroy();
-        charts.heatmap=new Chart(ctx,{
-            type:'bar',
-            data:{labels:data.map(d=>d.Diet_type),
-            datasets:[
-                {label:'Protein',data:data.map(d=>d['Protein(g)']),backgroundColor:'rgba(34,139,34,0.7)'},
-                {label:'Carbs',data:data.map(d=>d['Carbs(g)']),backgroundColor:'rgba(255,159,64,0.7)'},
-                {label:'Fat',data:data.map(d=>d['Fat(g)']),backgroundColor:'rgba(255,99,132,0.7)'}
-            ]},
-            options:{responsive:true, plugins:{legend:{display:true}}}
-        });
-    }
-
-    function createTopProteinChart(data){
-        const ctx=document.getElementById('topProteinChart');
-        if(charts.topProtein) charts.topProtein.destroy();
-
-        const groups={};
-        data.forEach(item=>{
-            if(!groups[item.Diet_type]) groups[item.Diet_type]=[];
-            groups[item.Diet_type].push(item);
+        // Filter functionality
+        document.getElementById('dietFilter').addEventListener('change', async (e) => {
+            const selectedDiet = e.target.value;
+            // Implement filtering logic here if needed
+            console.log('Filter changed to:', selectedDiet);
         });
 
-        const datasets=Object.keys(groups).map(diet=>({
-            label:diet,
-            data:groups[diet].map((item,i)=>({x:i+1,y:item['Protein(g)'],recipe:item.Recipe_name})),
-            backgroundColor:dietColors[diet]||'rgba(54,162,235,0.7)'
-        }));
+        // NEW: Recipe search using the same searchInput (press Enter)
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
 
-        charts.topProtein=new Chart(ctx,{
-            type:'scatter',
-            data:{datasets},
-            options:{plugins:{legend:{display:true}}}
-        });
-    }
+                    const query = searchInput.value.trim();
+                    const resultDiv = document.getElementById('recipeResult');
+                    const contentDiv = document.getElementById('recipeContent');
 
-    window.addEventListener('load', initCharts);
-</script>
+                    if (!query) {
+                        resultDiv.classList.remove('hidden');
+                        contentDiv.innerHTML = "<p>Please type a food item.</p>";
+                        return;
+                    }
 
+                    try {
+                        const res = await fetch(`/api/recipe?q=${encodeURIComponent(query)}`);
+                        const data = await res.json();
+
+                        resultDiv.classList.remove('hidden');
+
+                        if (!data.found) {
+                            contentDiv.innerHTML = `<p class="text-red-600">${data.message}</p>`;
+                            return;
+                        }
+
+                        const r = data.recipe;
+                        contentDiv.innerHTML = `
+                            <h4 class="text-lg font-bold mb-2">${r.title}</h4>
+                            <p class="mb-2">${r.description || ""}</p>
+                            <h5 class="font-semibold">Ingredients:</h5>
+                            <ul class="list-disc ml-6 mb-3">
+                                ${r.ingredients.map(i => `<li>${i}</li>`).join("")}
+                            </ul>
+                            <h5 class="font-semibold">Steps:</h5>
+                            <ol class="list-decimal ml-6">
+                                ${r.steps.map(s => `<li>${s}</li>`).join("")}
+                            </ol>
+                        `;
+                    } catch (err) {
+                        console.error(err);
+                        resultDiv.classList.remove('hidden');
+                        contentDiv.innerHTML = "<p class='text-red-600'>Error getting recipe.</p>";
+                    }
+                }
+            });
+        }
+
+        // Initialize charts on page load
+        window.addEventListener('load', initCharts);
+    </script>
 </body>
 </html>
