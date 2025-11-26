@@ -105,5 +105,72 @@ def distribution_api():
     stats = get_macronutrient_distribution(df)
     return jsonify(stats.to_dict())
 
+# ---------------------- RECIPE SEARCH API ----------------------
+
+# Simple built-in recipe dictionary
+RECIPES = {
+    "chicken": {
+        "title": "Simple Baked Chicken Breast",
+        "ingredients": [
+            "2 chicken breasts",
+            "1 tbsp olive oil",
+            "1 tsp salt",
+            "1 tsp black pepper",
+            "1 tsp garlic powder",
+            "1 tsp paprika"
+        ],
+        "steps": [
+            "Preheat oven to 400°F (200°C).",
+            "Rub chicken with olive oil and seasonings.",
+            "Bake 20–25 minutes until 165°F (74°C).",
+            "Rest 5 minutes before slicing."
+        ]
+    },
+    "oats": {
+        "title": "Warm Oatmeal Bowl",
+        "ingredients": [
+            "1/2 cup rolled oats",
+            "1 cup water or milk",
+            "1 tbsp honey",
+            "Banana slices",
+            "Berries or nuts"
+        ],
+        "steps": [
+            "Add oats + liquid to pot.",
+            "Simmer 5–7 minutes.",
+            "Transfer to bowl.",
+            "Top with banana, berries, nuts, and honey."
+        ]
+    },
+    "salad": {
+        "title": "Fresh Mixed Green Salad",
+        "ingredients": [
+            "2 cups mixed greens",
+            "Cherry tomatoes",
+            "Cucumber",
+            "1 tbsp olive oil",
+            "1 tsp lemon juice",
+            "Salt & pepper"
+        ],
+        "steps": [
+            "Add greens and vegetables to bowl.",
+            "Whisk lemon, oil, salt, pepper.",
+            "Pour dressing and toss."
+        ]
+    }
+}
+
+@app.route('/api/recipe')
+def recipe_api():
+    query = request.args.get("q", "").lower().strip()
+    if not query:
+        return jsonify({"found": False, "message": "Please type something."})
+
+    for key, recipe in RECIPES.items():
+        if key in query:
+            return jsonify({"found": True, "recipe": recipe})
+
+    return jsonify({"found": False, "message": "No recipe found for that food."})
+
 if __name__ == '__main__':
     app.run(debug=True)
