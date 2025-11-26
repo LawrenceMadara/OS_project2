@@ -1,0 +1,7 @@
+services:
+  diet-analysis-app:
+    image: diet-analysis
+    container_name: diet-analysis-container
+    build:
+      context: .
+    restart: unless-stopped
