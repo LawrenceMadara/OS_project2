@@ -1,0 +1,22 @@
+{
+  "name": "os_project2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LawrenceMadara/OS_project2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LawrenceMadara/OS_project2/issues"
+  },
+  "homepage": "https://github.com/LawrenceMadara/OS_project2#readme",
+  "description": ""
+}
