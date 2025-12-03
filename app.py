@@ -1,6 +1,9 @@
 
 from flask import Flask, jsonify, render_template, redirect, url_for, session # type: ignore
 import pandas as pd # type: ignore
+from flask_socketio import SocketIO, emit
+import pandas as pd
+import time
 from authlib.integrations.flask_client import OAuth
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 from azure.identity import DefaultAzureCredential
@@ -12,10 +15,118 @@ from analysis import (
 )
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 SUBSCRIPTION_ID = "YOUR_AZURE_SUBSCRIPTION"
 RESOURCE_GROUP = "YOUR_RESOURCE_GROUP"
 
 app.secret_key = "YOUR_SECRET_KEY"
+
+# ---------------------- Real-Time Endpoint ----------------------
+@socketio.on('start_analysis')
+def handle_start_analysis():
+    """Send live updates during analysis."""
+    emit('progress', {'status': 'Loading dataset...'})
+    time.sleep(1)
+
+    df = load_dataset("res/All_Diets.csv")
+    df = clean_macronutrients(df)
+    emit('progress', {'status': 'Calculating averages...'})
+    time.sleep(1)
+
+    avg_macros = calculate_average_macros(df)
+    emit('progress', {'status': 'Finding top protein recipes...'})
+    time.sleep(1)
+
+    top_protein = get_top_protein_recipes(df)
+    emit('progress', {'status': 'Generating summary...'})
+    time.sleep(1)
+
+    summary = run_full_analysis("res/All_Diets.csv")
+
+    emit('complete', {
+        'message': 'Analysis finished!',
+        'summary': {
+            "highest_protein_diet": summary["highest_protein_diet"],
+            "average_macros": summary["average_macros"].to_dict(orient='records'),
+            "common_cuisines": summary["common_cuisines"].to_dict(orient='records')
+        }
+    })
+
+    # ---------------------- RECIPE SEARCH API (NEW) ----------------------
+
+RECIPES = {
+    "chicken": {
+        "title": "Simple Baked Chicken Breast",
+        "description": "Easy oven-baked chicken breast with basic seasoning.",
+        "ingredients": [
+            "2 chicken breasts",
+            "1 tbsp olive oil",
+            "1 tsp salt",
+            "1/2 tsp black pepper",
+            "1 tsp garlic powder",
+            "1 tsp paprika"
+        ],
+        "steps": [
+            "Preheat oven to 400°F (200°C).",
+            "Pat the chicken dry and rub with olive oil.",
+            "Season both sides with salt, pepper, garlic powder, and paprika.",
+            "Bake for 20–25 minutes or until internal temperature reaches 165°F (74°C).",
+            "Rest for 5 minutes, then slice and serve."
+        ]
+    },
+    "oats": {
+        "title": "Basic Oatmeal Breakfast Bowl",
+        "description": "Warm oats with fruit and nuts.",
+        "ingredients": [
+            "1/2 cup rolled oats",
+            "1 cup water or milk",
+            "Pinch of salt",
+            "1 tbsp honey or maple syrup",
+            "1/2 banana, sliced",
+            "Handful of berries or nuts"
+        ],
+        "steps": [
+            "Add oats, liquid, and salt to a small pot.",
+            "Bring to a boil, then reduce to low and simmer 5–7 minutes, stirring.",
+            "Pour into a bowl and top with banana, berries, and nuts.",
+            "Drizzle with honey or maple syrup."
+        ]
+    },
+    "salad": {
+        "title": "Simple Mixed Green Salad",
+        "description": "Quick salad with basic dressing.",
+        "ingredients": [
+            "2 cups mixed greens",
+            "5 cherry tomatoes, halved",
+            "1/4 cucumber, sliced",
+            "1 tbsp olive oil",
+            "1 tsp lemon juice or vinegar",
+            "Salt and pepper"
+        ],
+        "steps": [
+            "Add greens, tomatoes, and cucumber to a bowl.",
+            "In a small bowl, whisk olive oil, lemon/vinegar, salt and pepper.",
+            "Pour dressing over the salad and toss gently.",
+            "Serve immediately."
+        ]
+    }
+}
+
+@app.route('/api/recipe')
+def get_recipe():
+    """Return a simple recipe based on a food keyword in the search."""
+    query = request.args.get("q", "").strip().lower()
+    if not query:
+        return jsonify({"found": False, "message": "Please type a food name."})
+
+    # basic keyword match
+    for keyword, recipe in RECIPES.items():
+        if keyword in query:
+            return jsonify({"found": True, "recipe": recipe})
+
+    return jsonify({"found": False, "message": "No recipe found for that food."})
+
+
 
 oauth = OAuth(app)
 
