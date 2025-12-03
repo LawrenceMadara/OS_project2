@@ -1,8 +1,10 @@
-from flask_socketio import SocketIO, emit
-from flask import Flask, jsonify, render_template, request
-from flask_socketio import SocketIO, emit
-import pandas as pd
-import time
+
+from flask import Flask, jsonify, render_template, redirect, url_for, session # type: ignore
+import pandas as pd # type: ignore
+from authlib.integrations.flask_client import OAuth
+from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.resource import ResourceManagementClient
 from analysis import (
     load_dataset, clean_macronutrients, calculate_average_macros,
     get_top_protein_recipes, add_nutrient_ratios, filter_by_diet,
@@ -10,122 +12,102 @@ from analysis import (
 )
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+SUBSCRIPTION_ID = "YOUR_AZURE_SUBSCRIPTION"
+RESOURCE_GROUP = "YOUR_RESOURCE_GROUP"
+
+app.secret_key = "YOUR_SECRET_KEY"
+
+oauth = OAuth(app)
+
+# Google OAuth
+google = oauth.register(
+    name='google',
+    client_id="GOOGLE_CLIENT_ID",
+    client_secret="GOOGLE_CLIENT_SECRET",
+    access_token_url="https://oauth2.googleapis.com/token",
+    authorize_url="https://accounts.google.com/o/oauth2/auth",
+    client_kwargs={"scope": "openid profile email"},
+)
+
+# GitHub OAuth
+github = oauth.register(
+    name='github',
+    client_id="GITHUB_CLIENT_ID",
+    client_secret="GITHUB_CLIENT_SECRET",
+    access_token_url="https://github.com/login/oauth/access_token",
+    authorize_url="https://github.com/login/oauth/authorize",
+    client_kwargs={"scope": "user:email"}
+)
+
+login_manager = LoginManager(app)
+
+class User(UserMixin):
+    def __init__(self, id_, email):
+        self.id = id_
+        self.email = email
+
+users = {}
+
+@app.route("/login/google")
+def login_google():
+    redirect_uri = url_for("auth_google", _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route("/auth/google")
+def auth_google():
+    token = google.authorize_access_token()
+    userinfo = google.parse_id_token(token)
+    
+    user = User(userinfo["sub"], userinfo["email"])
+    users[user.id] = user
+    login_user(user)
+
+    return redirect("/")
+
+@app.route("/login/github")
+def login_github():
+    redirect_uri = url_for("auth_github", _external=True)
+    return github.authorize_redirect(redirect_uri)
+
+@app.route("/auth/github")
+def auth_github():
+    token = github.authorize_access_token()
+    userinfo = github.get("user").json()
+
+    user = User(str(userinfo["id"]), userinfo["email"])
+    users[user.id] = user
+    login_user(user)
+
+    return redirect("/")
+
+
+@app.before_request
+def enforce_https():
+    if request.headers.get("X-Forwarded-Proto", "http") != "https":
+        url = request.url.replace("http://", "https://", 1)
+        return redirect(url, 301)
+
+@app.after_request
+def set_secure_headers(response):
+    response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm/chart.js; "
+        "style-src 'self' https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/ 'unsafe-inline'; "
+        "img-src 'self' data:; "
+        "connect-src 'self';"
+    )
+    return response
+
 
 @app.route('/')
 def index():
     """Render the main dashboard page."""
-    return render_template('index.html')
-
-# ---------------------- Real-Time Endpoint ----------------------
-@socketio.on('start_analysis')
-def handle_start_analysis():
-    """Send live updates during analysis."""
-    emit('progress', {'status': 'Loading dataset...'})
-    time.sleep(1)
-
-    df = load_dataset("res/All_Diets.csv")
-    df = clean_macronutrients(df)
-    emit('progress', {'status': 'Calculating averages...'})
-    time.sleep(1)
-
-    avg_macros = calculate_average_macros(df)
-    emit('progress', {'status': 'Finding top protein recipes...'})
-    time.sleep(1)
-
-    top_protein = get_top_protein_recipes(df)
-    emit('progress', {'status': 'Generating summary...'})
-    time.sleep(1)
-
-    summary = run_full_analysis("res/All_Diets.csv")
-
-    emit('complete', {
-        'message': 'Analysis finished!',
-        'summary': {
-            "highest_protein_diet": summary["highest_protein_diet"],
-            "average_macros": summary["average_macros"].to_dict(orient='records'),
-            "common_cuisines": summary["common_cuisines"].to_dict(orient='records')
-        }
-    })
-
-
-
-# ---------------------- RECIPE SEARCH API (NEW) ----------------------
-
-RECIPES = {
-    "chicken": {
-        "title": "Simple Baked Chicken Breast",
-        "description": "Easy oven-baked chicken breast with basic seasoning.",
-        "ingredients": [
-            "2 chicken breasts",
-            "1 tbsp olive oil",
-            "1 tsp salt",
-            "1/2 tsp black pepper",
-            "1 tsp garlic powder",
-            "1 tsp paprika"
-        ],
-        "steps": [
-            "Preheat oven to 400°F (200°C).",
-            "Pat the chicken dry and rub with olive oil.",
-            "Season both sides with salt, pepper, garlic powder, and paprika.",
-            "Bake for 20–25 minutes or until internal temperature reaches 165°F (74°C).",
-            "Rest for 5 minutes, then slice and serve."
-        ]
-    },
-    "oats": {
-        "title": "Basic Oatmeal Breakfast Bowl",
-        "description": "Warm oats with fruit and nuts.",
-        "ingredients": [
-            "1/2 cup rolled oats",
-            "1 cup water or milk",
-            "Pinch of salt",
-            "1 tbsp honey or maple syrup",
-            "1/2 banana, sliced",
-            "Handful of berries or nuts"
-        ],
-        "steps": [
-            "Add oats, liquid, and salt to a small pot.",
-            "Bring to a boil, then reduce to low and simmer 5–7 minutes, stirring.",
-            "Pour into a bowl and top with banana, berries, and nuts.",
-            "Drizzle with honey or maple syrup."
-        ]
-    },
-    "salad": {
-        "title": "Simple Mixed Green Salad",
-        "description": "Quick salad with basic dressing.",
-        "ingredients": [
-            "2 cups mixed greens",
-            "5 cherry tomatoes, halved",
-            "1/4 cucumber, sliced",
-            "1 tbsp olive oil",
-            "1 tsp lemon juice or vinegar",
-            "Salt and pepper"
-        ],
-        "steps": [
-            "Add greens, tomatoes, and cucumber to a bowl.",
-            "In a small bowl, whisk olive oil, lemon/vinegar, salt and pepper.",
-            "Pour dressing over the salad and toss gently.",
-            "Serve immediately."
-        ]
-    }
-}
-
-@app.route('/api/recipe')
-def get_recipe():
-    """Return a simple recipe based on a food keyword in the search."""
-    query = request.args.get("q", "").strip().lower()
-    if not query:
-        return jsonify({"found": False, "message": "Please type a food name."})
-
-    # basic keyword match
-    for keyword, recipe in RECIPES.items():
-        if keyword in query:
-            return jsonify({"found": True, "recipe": recipe})
-
-    return jsonify({"found": False, "message": "No recipe found for that food."})
-
-
-# ---------------------- EXISTING APIs (UNCHANGED) ----------------------
+    return render_template('index.html')  
 
 @app.route('/api/avg_macros')
 def avg_macros_api():
@@ -219,3 +201,15 @@ def distribution_api():
     stats = get_macronutrient_distribution(df)
     return jsonify(stats.to_dict())
 
+@app.route("/cleanup", methods=["POST"])
+def cleanup_resources():
+    credential = DefaultAzureCredential()
+    client = ResourceManagementClient(credential, SUBSCRIPTION_ID)
+
+    delete_op = client.resource_groups.begin_delete(RESOURCE_GROUP)
+    delete_op.wait()
+
+    return {"status": "cleanup_complete"}
+
+if __name__ == '__main__':
+    app.run(debug=True)
