@@ -81,13 +81,21 @@
                 <input type="text" id="searchInput" placeholder="Search by Diet Type or Food (e.g. chicken, oats, salad)"
                        class="p-2 border rounded w-full sm:w-auto focus:ring focus:ring-blue-300">
 
-                <select id="dietFilter" class="p-2 border rounded w-full sm:w-auto focus:ring focus:ring-blue-300">
-                    <option value="all">All Diet Types</option>
-                    <option value="Vegan">Vegan</option>
-                    <option value="Keto">Keto</option>
-                    <option value="Paleo">Paleo</option>
-                    <option value="Vegetarian">Vegetarian</option>
-                </select>
+             <div class="flex flex-col sm:flex-row items-center gap-2">
+                    <label for="dietFilter" class="font-semibold text-gray-700">Filter by Diet Type:</label>
+                    <select 
+                        id="dietFilter" 
+                        class="p-2 border border-gray-300 rounded-lg w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                        onchange="filterDiet()"
+                    >
+                        <option value="all">All Diet Types</option>
+                        <option value="Vegan">Vegan</option>
+                        <option value="Keto">Keto</option>
+                        <option value="Paleo">Paleo</option>
+                        <option value="Vegetarian">Vegetarian</option>
+                    </select>
+                </div>
+
 
                 <!-- Button to refresh charts -->
                 <button id="refreshBtn"
@@ -471,5 +479,47 @@
         // Initialize charts on page load
         window.addEventListener('load', initCharts);
     </script>
+    <!-- Socket.IO Real-Time Script -->
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+  const socket = io(); // connects to Flask-SocketIO
+
+  // Add a "Run Analysis" button and output area
+  const footer = document.querySelector("footer");
+  const analysisContainer = document.createElement("div");
+  analysisContainer.className = "bg-white p-6 shadow-lg rounded-lg mt-10 text-center";
+
+  analysisContainer.innerHTML = `
+    <h2 class="text-2xl font-semibold mb-4 text-gray-800">Real-Time Analysis</h2>
+    <button id="runAnalysisBtn" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">
+      🚀 Run Full Analysis
+    </button>
+    <div id="analysisUpdates" class="mt-4 text-left text-gray-700 font-mono text-sm bg-gray-50 p-3 rounded overflow-y-auto max-h-64"></div>
+  `;
+  footer.parentNode.insertBefore(analysisContainer, footer);
+
+  // Hook button click
+  document.getElementById("runAnalysisBtn").addEventListener("click", () => {
+    const logDiv = document.getElementById("analysisUpdates");
+    logDiv.innerHTML = "<p>Starting analysis...</p>";
+    socket.emit("start_analysis");
+  });
+
+  // Receive live progress updates
+  socket.on("progress", (msg) => {
+    const logDiv = document.getElementById("analysisUpdates");
+    logDiv.innerHTML += `<p>🔄 ${msg.status}</p>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  });
+
+  // Receive completion message
+  socket.on("complete", (msg) => {
+    const logDiv = document.getElementById("analysisUpdates");
+    logDiv.innerHTML += `<p class="text-green-600 font-semibold mt-2">✅ ${msg.message}</p>`;
+    logDiv.innerHTML += `<pre class="text-xs bg-gray-100 p-2 rounded mt-2">${JSON.stringify(msg.summary, null, 2)}</pre>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  });
+</script>
+
 </body>
 </html>

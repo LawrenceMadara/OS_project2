@@ -1,5 +1,8 @@
+from flask_socketio import SocketIO, emit
 from flask import Flask, jsonify, render_template, request
+from flask_socketio import SocketIO, emit
 import pandas as pd
+import time
 from analysis import (
     load_dataset, clean_macronutrients, calculate_average_macros,
     get_top_protein_recipes, add_nutrient_ratios, filter_by_diet,
@@ -7,11 +10,44 @@ from analysis import (
 )
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/')
 def index():
     """Render the main dashboard page."""
     return render_template('index.html')
+
+# ---------------------- Real-Time Endpoint ----------------------
+@socketio.on('start_analysis')
+def handle_start_analysis():
+    """Send live updates during analysis."""
+    emit('progress', {'status': 'Loading dataset...'})
+    time.sleep(1)
+
+    df = load_dataset("res/All_Diets.csv")
+    df = clean_macronutrients(df)
+    emit('progress', {'status': 'Calculating averages...'})
+    time.sleep(1)
+
+    avg_macros = calculate_average_macros(df)
+    emit('progress', {'status': 'Finding top protein recipes...'})
+    time.sleep(1)
+
+    top_protein = get_top_protein_recipes(df)
+    emit('progress', {'status': 'Generating summary...'})
+    time.sleep(1)
+
+    summary = run_full_analysis("res/All_Diets.csv")
+
+    emit('complete', {
+        'message': 'Analysis finished!',
+        'summary': {
+            "highest_protein_diet": summary["highest_protein_diet"],
+            "average_macros": summary["average_macros"].to_dict(orient='records'),
+            "common_cuisines": summary["common_cuisines"].to_dict(orient='records')
+        }
+    })
+
 
 
 # ---------------------- RECIPE SEARCH API (NEW) ----------------------
@@ -183,5 +219,3 @@ def distribution_api():
     stats = get_macronutrient_distribution(df)
     return jsonify(stats.to_dict())
 
-if __name__ == '__main__':
-    app.run(debug=True)
