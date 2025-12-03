@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nutritional Insights</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
 
 <body class="bg-gray-100 font-sans">
@@ -17,152 +19,174 @@
 
     <!-- Main Content -->
     <main class="container mx-auto p-6">
-        
-        <!-- Explore Nutritional Insights Section -->
+        <!-- Overview Section -->
         <section class="mb-10">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Explore Nutritional Insights</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Bar Chart -->
-                <div class="bg-white p-6 shadow-lg rounded-lg">
-                    <h3 class="font-semibold mb-2">Bar Chart</h3>
-                    <p class="text-sm text-gray-600 mb-4">Average macronutrient content by diet type.</p>
-                    <canvas id="barChart" style="max-height: 200px;"></canvas>
+
+                <!-- Protein Bar Chart -->
+                <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
+                    <h3 class="font-semibold mb-2">Protein Bar Chart</h3>
+                    <p class="text-sm text-gray-600 mb-2 text-center">
+                        Average Protein content by Diet Type
+                    </p>
+                    <canvas id="proteinChart" class="w-full" style="max-height: 200px;"></canvas>
                 </div>
 
-                <!-- Scatter Plot -->
-                <div class="bg-white p-6 shadow-lg rounded-lg">
-                    <h3 class="font-semibold mb-2">Scatter Plot</h3>
-                    <p class="text-sm text-gray-600 mb-4">Nutrient relationships (e.g., protein vs carbs).</p>
-                    <canvas id="scatterChart" style="max-height: 200px;"></canvas>
+                <!-- Carbs Bar Chart -->
+                <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
+                    <h3 class="font-semibold mb-2">Carbs Bar Chart</h3>
+                    <p class="text-sm text-gray-600 mb-2 text-center">
+                        Average Carbohydrates by Diet Type
+                    </p>
+                    <canvas id="carbsChart" class="w-full" style="max-height: 200px;"></canvas>
                 </div>
 
-                <!-- Heatmap -->
-                <div class="bg-white p-6 shadow-lg rounded-lg">
-                    <h3 class="font-semibold mb-2">Heatmap</h3>
-                    <p class="text-sm text-gray-600 mb-4">Nutrient correlations.</p>
-                    <canvas id="heatmapChart" style="max-height: 200px;"></canvas>
+                <!-- Fat Bar Chart -->
+                <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
+                    <h3 class="font-semibold mb-2">Fat Bar Chart</h3>
+                    <p class="text-sm text-gray-600 mb-2 text-center">
+                        Average Fat content by Diet Type
+                    </p>
+                    <canvas id="fatChart" class="w-full" style="max-height: 200px;"></canvas>
                 </div>
 
-                <!-- Pie Chart -->
-                <div class="bg-white p-6 shadow-lg rounded-lg">
-                    <h3 class="font-semibold mb-2">Pie Chart</h3>
-                    <p class="text-sm text-gray-600 mb-4">Recipe distribution by diet type.</p>
-                    <canvas id="pieChart" style="max-height: 200px;"></canvas>
+                <!-- Heatmap (using grouped bar chart) -->
+                <div class="bg-white p-4 shadow-lg rounded-lg flex flex-col items-center">
+                    <h3 class="font-semibold mb-2">Macronutrient Overview</h3>
+                    <p class="text-sm text-gray-600 mb-2 text-center">
+                        All Macronutrients by Diet Type
+                    </p>
+                    <canvas id="heatmapChart" class="w-full" style="max-height: 200px;"></canvas>
                 </div>
             </div>
         </section>
 
-        <!-- Filters and Data Interaction -->
+        <!-- Scatter Plot Section -->
         <section class="mb-10">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Filters and Data Interaction</h2>
-            
-            <div class="flex flex-wrap gap-4 items-center">
-                <input type="text" id="searchInput" placeholder="Search by Diet Type" 
-                       class="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-64">
-                
-                <select id="dietFilter" class="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Top Protein-Rich Recipes</h2>
+            <div class="bg-white p-6 shadow-lg rounded-lg flex flex-col items-center">
+                <p class="text-sm text-gray-600 mb-2 text-center">
+                    Top 5 protein-rich recipes per diet type
+                </p>
+                <canvas id="topProteinChart" style="max-height: 400px;"></canvas>
+            </div>
+        </section>
+
+        <!-- Controls Section -->
+        <section class="mb-10">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Data Interaction</h2>
+
+            <div class="flex flex-wrap gap-4 mb-6">
+                <input type="text" id="searchInput" placeholder="Search by Diet Type"
+                    class="p-2 border rounded w-full sm:w-auto focus:ring focus:ring-blue-300">
+
+                <select id="dietFilter" aria-label="Filter by diet type"
+                    class="p-2 border rounded w-full sm:w-auto focus:ring focus:ring-blue-300">
                     <option value="all">All Diet Types</option>
                     <option value="Vegan">Vegan</option>
                     <option value="Keto">Keto</option>
                     <option value="Paleo">Paleo</option>
                     <option value="Vegetarian">Vegetarian</option>
                 </select>
-            </div>
-        </section>
 
-        <!-- API Data Interaction -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">API Data Interaction</h2>
-            
-            <div class="flex flex-wrap gap-4">
-                <button id="getNutritionalInsights" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
-                    Get Nutritional Insights
-                </button>
-                <button id="getRecipes" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">
-                    Get Recipes
-                </button>
-                <button id="getClusters" class="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition">
-                    Get Clusters
+                <!-- Button to refresh charts -->
+                <button id="refreshBtn" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
+                    🔄 Refresh Charts
                 </button>
             </div>
 
-            <div id="apiResponse" class="mt-4 bg-white p-4 shadow rounded hidden">
-                <h3 class="text-lg font-semibold mb-2">API Response</h3>
-                <pre id="apiContent" class="text-xs bg-gray-100 p-3 rounded overflow-auto max-h-64"></pre>
-            </div>
+            <div id="statusMessage" class="text-gray-700"></div>
         </section>
 
         <!-- Security & Compliance -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Security & Compliance</h2>
-            
-            <div class="bg-white p-6 shadow-lg rounded-lg">
-                <h3 class="text-lg font-semibold mb-3">Security Status</h3>
-                <div id="securityStatus" class="space-y-1 text-sm">
-                    <p>Encryption: <span class="text-green-600 font-semibold">Enabled</span></p>
-                    <p>Access Control: <span class="text-green-600 font-semibold">Secure</span></p>
-                    <p>Compliance: <span class="text-green-600 font-semibold">GDPR Compliant</span></p>
+        <section class="mt-8">
+            <h2 class="text-2xl font-semibold mb-4">Security & Compliance</h2>
+            <div class="bg-white p-4 shadow-lg rounded-lg">
+                <h3 class="font-semibold">Security Status</h3>
+                <p class="text-sm text-gray-600">Encryption: <span class="font-semibold text-green-600">Enabled</span>
+                </p>
+                <p class="text-sm text-gray-600">Access Control: <span
+                        class="font-semibold text-green-600">Secure</span></p>
+                <p class="text-sm text-gray-600">Compliance: <span class="font-semibold text-green-600">GDPR
+                        Compliant</span></p>
+            </div>
+        </section>
+
+        <!-- OAuth / 2FA Integration -->
+        <section class="mt-8">
+            <h2 class="text-2xl font-semibold mb-4">OAuth & 2FA Integration</h2>
+            <div class="bg-white p-4 shadow-lg rounded-lg">
+                <h3 class="font-semibold">Secure Login</h3>
+
+                <button id="googleLogin" class="bg-blue-600 text-white py-2 px-4 rounded mb-4">
+                    Login with Google
+                </button>
+
+                <button id="githubLogin" class="bg-blue-600 text-white py-2 px-4 rounded mb-4">
+                    Login with GitHub
+                </button>
+
+                <div class="mt-4">
+                    <label for="2fa" class="block text-sm text-gray-600">Enter 2FA Code</label>
+                    <input id="2fa" type="text" class="p-2 border rounded w-full" placeholder="Enter your 2FA code">
+
+                    <button id="verify2fa" class="bg-green-600 text-white py-2 px-4 rounded mt-3">
+                        Verify 2FA
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- OAuth & 2FA Integration -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">OAuth & 2FA Integration</h2>
-            
-            <div class="bg-white p-6 shadow-lg rounded-lg">
-                <h3 class="text-lg font-semibold mb-4">Secure Login</h3>
-                
-                <div class="flex flex-wrap gap-4 mb-6">
-                    <button id="loginGoogle" class="bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700 transition">
-                        Login with Google
-                    </button>
-                    <button id="loginGitHub" class="bg-gray-800 text-white py-2 px-6 rounded hover:bg-gray-900 transition">
-                        Login with GitHub
-                    </button>
-                </div>
+        <script>
+            // Google Login Redirect
+            document.getElementById("googleLogin").onclick = () => {
+                window.location.href = "/login/google";
+            };
 
-                <div>
-                    <label class="block text-sm font-semibold mb-2">Enter 2FA Code</label>
-                    <input type="text" id="twoFactorCode" placeholder="Enter your 2FA code" 
-                           class="p-2 border rounded w-full focus:ring focus:ring-blue-300">
-                </div>
-            </div>
-        </section>
+            // GitHub Login Redirect
+            document.getElementById("githubLogin").onclick = () => {
+                window.location.href = "/login/github";
+            };
+
+            // 2FA Verification
+            document.getElementById("verify2fa").onclick = async () => {
+                const code = document.getElementById("2fa").value;
+
+                const res = await fetch("/2fa/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code })
+                });
+
+                if (res.status === 200) {
+                    alert("2FA Verified ✓");
+                } else {
+                    alert("Invalid 2FA Code ❌");
+                }
+            };
+        </script>
 
         <!-- Cloud Resource Cleanup -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Cloud Resource Cleanup</h2>
-            
-            <div class="bg-white p-6 shadow-lg rounded-lg">
-                <p class="text-sm text-gray-700 mb-4">Ensure that cloud resources are efficiently managed and cleaned up post-deployment.</p>
-                
-                <button id="cleanupBtn" class="bg-red-600 text-white py-2 px-6 rounded hover:bg-red-700 transition">
-                    Clean Up Resources
-                </button>
+        <section class="mt-8">
+            <h2 class="text-2xl font-semibold mb-4">Cloud Resource Cleanup</h2>
+            <div class="bg-white p-4 shadow-lg rounded-lg">
+                <p class="text-sm text-gray-600">Ensure that cloud resources are efficiently managed and cleaned up
+                    post-deployment.</p>
+                <button class="bg-red-600 text-white py-2 px-4 rounded">Clean Up Resources</button>
+                <script>
+                    document.getElementById("cleanupBtn").onclick = async () => {
+                        if (!confirm("Are you sure you want to delete all cloud resources?")) return;
 
-                <div id="cleanupStatus" class="mt-4 text-xs text-gray-700 font-mono bg-gray-50 p-3 rounded overflow-y-auto max-h-32 hidden"></div>
-            </div>
-        </section>
+                        const res = await fetch("/cleanup", { method: "POST" });
 
-        <!-- Pagination -->
-        <section class="mb-10">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Pagination</h2>
-            
-            <div class="flex justify-center gap-2">
-                <button class="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition">
-                    Previous
-                </button>
-                <button class="bg-blue-600 text-white py-2 px-4 rounded">
-                    1
-                </button>
-                <button class="bg-gray-200 text-gray-700 py-2 px-4 rounded hover:bg-gray-300 transition">
-                    2
-                </button>
-                <button class="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition">
-                    Next
-                </button>
+                        if (res.status === 200)
+                            alert("Cloud resources deleted successfully!");
+                        else
+                            alert("Failed to clean up resources.");
+                    };
+                </script>
             </div>
         </section>
 
@@ -173,308 +197,315 @@
         <p>&copy; 2025 Nutritional Insights. All Rights Reserved.</p>
     </footer>
 
+    <!-- JavaScript for Charts -->
     <script>
-        // ============================================
-        // GLOBAL STATE & INITIALIZATION
-        // ============================================
-        let socket = null;
-        let isInitialized = false;
-
-        // Mock data
-        const mockData = {
-            avgMacros: [
-                { Diet_type: 'Vegan', Protein: 15, Carbs: 45, Fat: 12 },
-                { Diet_type: 'Keto', Protein: 30, Carbs: 8, Fat: 35 },
-                { Diet_type: 'Paleo', Protein: 28, Carbs: 25, Fat: 20 },
-                { Diet_type: 'Vegetarian', Protein: 18, Carbs: 40, Fat: 15 }
-            ],
-            recipes: [
-                { name: 'Tofu Scramble', diet: 'Vegan', protein: 22 },
-                { name: 'Ribeye Steak', diet: 'Keto', protein: 45 },
-                { name: 'Grilled Chicken', diet: 'Paleo', protein: 40 },
-                { name: 'Greek Yogurt', diet: 'Vegetarian', protein: 25 }
-            ]
+        // Store chart instances globally
+        let charts = {
+            protein: null,
+            carbs: null,
+            fat: null,
+            heatmap: null,
+            topProtein: null
         };
 
-        let charts = {};
+        // Color palette for different diet types
+        const dietColors = {
+            'Vegan': 'rgba(34, 139, 34, 0.7)',
+            'Keto': 'rgba(255, 99, 132, 0.7)',
+            'Paleo': 'rgba(255, 159, 64, 0.7)',
+            'Vegetarian': 'rgba(75, 192, 192, 0.7)',
+            'Dash': 'rgba(153, 102, 255, 0.7)',
+            'Mediterranean': 'rgba(54, 162, 235, 0.7)'
+        };
 
-        // ============================================
-        // SOCKET.IO SETUP
-        // ============================================
-        function initSocket() {
+        // Common chart options
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        };
+
+        // Initialize all charts
+        async function initCharts() {
             try {
-                socket = io({
-                    reconnection: true,
-                    reconnectionDelay: 1000,
-                    reconnectionAttempts: 5,
-                    timeout: 10000
-                });
+                const avgMacrosData = await fetch('/api/avg_macros').then(r => r.json());
+                const topProteinData = await fetch('/api/top_protein').then(r => r.json());
 
-                socket.on('connect', () => {
-                    console.log('✅ Socket connected');
-                    updateSecurityStatus('Connected', 'green');
-                });
-
-                socket.on('connect_error', (err) => {
-                    console.warn('⚠️ Connection error:', err.message);
-                    updateSecurityStatus('Offline Mode', 'yellow');
-                });
-
-                socket.on('disconnect', () => {
-                    console.log('🔌 Disconnected');
-                    updateSecurityStatus('Disconnected', 'red');
-                });
-
-                socket.on('progress', (msg) => {
-                    console.log('Progress:', msg);
-                });
-
-                socket.on('complete', (msg) => {
-                    console.log('Complete:', msg);
-                });
-
-                socket.on('cleanup_update', (msg) => {
-                    const cleanupDiv = document.getElementById('cleanupStatus');
-                    if (cleanupDiv && msg) {
-                        cleanupDiv.classList.remove('hidden');
-                        cleanupDiv.innerHTML += `<p>${msg.status || msg}</p>`;
-                        cleanupDiv.scrollTop = cleanupDiv.scrollHeight;
-                    }
-                });
-
-            } catch (err) {
-                console.error('Socket init failed:', err);
-                updateSecurityStatus('Offline', 'red');
+                createProteinChart(avgMacrosData);
+                createCarbsChart(avgMacrosData);
+                createFatChart(avgMacrosData);
+                createHeatmapChart(avgMacrosData);
+                createTopProteinChart(topProteinData);
+            } catch (error) {
+                console.error('Error loading chart data:', error);
+                document.getElementById('statusMessage').textContent = '❌ Error loading data';
             }
         }
 
-        function updateSecurityStatus(status, color) {
-            const statusDiv = document.getElementById('securityStatus');
-            if (statusDiv) {
-                const colorClass = color === 'green' ? 'text-green-600' : color === 'yellow' ? 'text-yellow-600' : 'text-red-600';
-                statusDiv.innerHTML = `
-                    <p>Encryption: <span class="${colorClass} font-semibold">Enabled</span></p>
-                    <p>Access Control: <span class="${colorClass} font-semibold">Secure</span></p>
-                    <p>Compliance: <span class="${colorClass} font-semibold">GDPR Compliant</span></p>
-                    <p class="text-xs text-gray-500 mt-2">Status: ${status}</p>
-                `;
-            }
-        }
+        // Create Protein Bar Chart
+        function createProteinChart(data) {
+            const ctx = document.getElementById('proteinChart').getContext('2d');
 
-        // ============================================
-        // CHART CREATION
-        // ============================================
-        function createBarChart() {
-            const ctx = document.getElementById('barChart');
-            if (!ctx) return;
+            if (charts.protein) charts.protein.destroy();
 
-            if (charts.bar) charts.bar.destroy();
-
-            charts.bar = new Chart(ctx, {
+            charts.protein = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: mockData.avgMacros.map(d => d.Diet_type),
+                    labels: data.map(d => d.Diet_type),
                     datasets: [{
                         label: 'Protein (g)',
-                        data: mockData.avgMacros.map(d => d.Protein),
-                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
+                        data: data.map(d => d['Protein(g)']),
+                        backgroundColor: data.map(d => dietColors[d.Diet_type] || 'rgba(54, 162, 235, 0.7)'),
+                        borderColor: data.map(d => dietColors[d.Diet_type]?.replace('0.7', '1') || 'rgba(54, 162, 235, 1)'),
                         borderWidth: 1
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
-            });
-        }
-
-        function createScatterChart() {
-            const ctx = document.getElementById('scatterChart');
-            if (!ctx) return;
-
-            if (charts.scatter) charts.scatter.destroy();
-
-            charts.scatter = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Protein vs Carbs',
-                        data: mockData.avgMacros.map(d => ({ x: d.Carbs, y: d.Protein })),
-                        backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                        borderColor: 'rgba(34, 197, 94, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { title: { display: true, text: 'Carbs (g)' } },
-                        y: { title: { display: true, text: 'Protein (g)' } }
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Protein (g)'
+                            }
+                        }
                     }
                 }
             });
         }
 
-        function createHeatmapChart() {
-            const ctx = document.getElementById('heatmapChart');
-            if (!ctx) return;
+        // Create Carbs Bar Chart
+        function createCarbsChart(data) {
+            const ctx = document.getElementById('carbsChart').getContext('2d');
+
+            if (charts.carbs) charts.carbs.destroy();
+
+            charts.carbs = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.Diet_type),
+                    datasets: [{
+                        label: 'Carbs (g)',
+                        data: data.map(d => d['Carbs(g)']),
+                        backgroundColor: data.map(d => dietColors[d.Diet_type] || 'rgba(255, 159, 64, 0.7)'),
+                        borderColor: data.map(d => dietColors[d.Diet_type]?.replace('0.7', '1') || 'rgba(255, 159, 64, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Carbs (g)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create Fat Bar Chart
+        function createFatChart(data) {
+            const ctx = document.getElementById('fatChart').getContext('2d');
+
+            if (charts.fat) charts.fat.destroy();
+
+            charts.fat = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.Diet_type),
+                    datasets: [{
+                        label: 'Fat (g)',
+                        data: data.map(d => d['Fat(g)']),
+                        backgroundColor: data.map(d => dietColors[d.Diet_type] || 'rgba(153, 102, 255, 0.7)'),
+                        borderColor: data.map(d => dietColors[d.Diet_type]?.replace('0.7', '1') || 'rgba(153, 102, 255, 1)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Fat (g)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create Heatmap (Grouped Bar Chart)
+        function createHeatmapChart(data) {
+            const ctx = document.getElementById('heatmapChart').getContext('2d');
 
             if (charts.heatmap) charts.heatmap.destroy();
 
             charts.heatmap = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: mockData.avgMacros.map(d => d.Diet_type),
+                    labels: data.map(d => d.Diet_type),
                     datasets: [
                         {
                             label: 'Protein',
-                            data: mockData.avgMacros.map(d => d.Protein),
-                            backgroundColor: 'rgba(34, 139, 34, 0.7)'
+                            data: data.map(d => d['Protein(g)']),
+                            backgroundColor: 'rgba(34, 139, 34, 0.7)',
+                            borderColor: 'rgba(34, 139, 34, 1)',
+                            borderWidth: 1
                         },
                         {
                             label: 'Carbs',
-                            data: mockData.avgMacros.map(d => d.Carbs),
-                            backgroundColor: 'rgba(255, 159, 64, 0.7)'
+                            data: data.map(d => d['Carbs(g)']),
+                            backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderWidth: 1
                         },
                         {
                             label: 'Fat',
-                            data: mockData.avgMacros.map(d => d.Fat),
-                            backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                            data: data.map(d => d['Fat(g)']),
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: true, position: 'bottom' } },
-                    scales: { y: { beginAtZero: true } }
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Grams'
+                            }
+                        }
+                    }
                 }
             });
         }
 
-        function createPieChart() {
-            const ctx = document.getElementById('pieChart');
-            if (!ctx) return;
+        // Create Top Protein Scatter/Bubble Chart
+        function createTopProteinChart(data) {
+            const ctx = document.getElementById('topProteinChart').getContext('2d');
 
-            if (charts.pie) charts.pie.destroy();
+            if (charts.topProtein) charts.topProtein.destroy();
 
-            charts.pie = new Chart(ctx, {
-                type: 'pie',
+            // Group data by diet type
+            const dietGroups = {};
+            data.forEach(item => {
+                if (!dietGroups[item.Diet_type]) {
+                    dietGroups[item.Diet_type] = [];
+                }
+                dietGroups[item.Diet_type].push(item);
+            });
+
+            // Create datasets for each diet type
+            const datasets = Object.keys(dietGroups).map(diet => ({
+                label: diet,
+                data: dietGroups[diet].map((item, index) => ({
+                    x: index + 1,
+                    y: item['Protein(g)'],
+                    recipe: item.Recipe_name,
+                    cuisine: item.Cuisine_type
+                })),
+                backgroundColor: dietColors[diet] || 'rgba(54, 162, 235, 0.7)',
+                borderColor: dietColors[diet]?.replace('0.7', '1') || 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                pointRadius: 6,
+                pointHoverRadius: 8
+            }));
+
+            charts.topProtein = new Chart(ctx, {
+                type: 'scatter',
                 data: {
-                    labels: mockData.avgMacros.map(d => d.Diet_type),
-                    datasets: [{
-                        data: [25, 30, 20, 25],
-                        backgroundColor: [
-                            'rgba(34, 139, 34, 0.7)',
-                            'rgba(255, 99, 132, 0.7)',
-                            'rgba(255, 159, 64, 0.7)',
-                            'rgba(75, 192, 192, 0.7)'
-                        ]
-                    }]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const item = context.raw;
+                                    return [
+                                        `Recipe: ${item.recipe}`,
+                                        `Protein: ${item.y}g`,
+                                        `Cuisine: ${item.cuisine || 'N/A'}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Rank (Top 5 per Diet)'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Protein (g)'
+                            }
+                        }
+                    }
                 }
             });
         }
 
-        function initCharts() {
-            createBarChart();
-            createScatterChart();
-            createHeatmapChart();
-            createPieChart();
-        }
-
-        // ============================================
-        // EVENT HANDLERS
-        // ============================================
-        document.getElementById('getNutritionalInsights').addEventListener('click', () => {
-            const apiDiv = document.getElementById('apiResponse');
-            const contentDiv = document.getElementById('apiContent');
-            apiDiv.classList.remove('hidden');
-            contentDiv.textContent = JSON.stringify(mockData.avgMacros, null, 2);
-        });
-
-        document.getElementById('getRecipes').addEventListener('click', () => {
-            const apiDiv = document.getElementById('apiResponse');
-            const contentDiv = document.getElementById('apiContent');
-            apiDiv.classList.remove('hidden');
-            contentDiv.textContent = JSON.stringify(mockData.recipes, null, 2);
-        });
-
-        document.getElementById('getClusters').addEventListener('click', () => {
-            const apiDiv = document.getElementById('apiResponse');
-            const contentDiv = document.getElementById('apiContent');
-            apiDiv.classList.remove('hidden');
-            contentDiv.textContent = JSON.stringify({ clusters: 4, method: 'K-Means' }, null, 2);
-        });
-
-        document.getElementById('cleanupBtn').addEventListener('click', () => {
-            const cleanupDiv = document.getElementById('cleanupStatus');
-            cleanupDiv.classList.remove('hidden');
-            cleanupDiv.innerHTML = '<p>⏳ Starting cleanup...</p>';
-            
-            const steps = [
-                '🔄 Scanning resources...',
-                '🧹 Removing temporary files...',
-                '🗑️ Clearing cache...',
-                '✅ Cleanup complete!'
-            ];
-
-            steps.forEach((step, idx) => {
-                setTimeout(() => {
-                    cleanupDiv.innerHTML += `<p>${step}</p>`;
-                    cleanupDiv.scrollTop = cleanupDiv.scrollHeight;
-                }, (idx + 1) * 1000);
-            });
-        });
-
-        document.getElementById('loginGoogle').addEventListener('click', () => {
-            alert('Google OAuth login initiated (demo mode)');
-        });
-
-        document.getElementById('loginGitHub').addEventListener('click', () => {
-            alert('GitHub OAuth login initiated (demo mode)');
-        });
-
-        document.getElementById('dietFilter').addEventListener('change', (e) => {
-            console.log('Filter changed to:', e.target.value);
-        });
-
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            console.log('Search:', e.target.value);
-        });
-
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        window.addEventListener('load', () => {
-            if (isInitialized) return;
-            isInitialized = true;
-
-            initSocket();
-            initCharts();
-            updateSecurityStatus('Initializing...', 'yellow');
-            
-            setTimeout(() => {
-                updateSecurityStatus('Active', 'green');
-            }, 1000);
-        });
-
-        // Real-time updates simulation
-        setInterval(() => {
-            // Simulate real-time data updates
-            if (Math.random() > 0.7) {
-                console.log('🔄 Real-time update received');
+        // Refresh button functionality
+        document.getElementById('refreshBtn').addEventListener('click', async () => {
+            const status = document.getElementById('statusMessage');
+            status.textContent = 'Refreshing charts...';
+            try {
+                await initCharts();
+                status.textContent = '✅ Charts refreshed!';
+                setTimeout(() => status.textContent = '', 3000);
+            } catch (e) {
+                status.textContent = '❌ Failed to refresh charts.';
+                console.error(e);
             }
-        }, 5000);
+        });
+
+        // Filter functionality
+        document.getElementById('dietFilter').addEventListener('change', async (e) => {
+            const selectedDiet = e.target.value;
+            // Implement filtering logic here if needed
+            console.log('Filter changed to:', selectedDiet);
+        });
+
+        // Initialize charts on page load
+        window.addEventListener('load', initCharts);
     </script>
 </body>
+
 </html>
