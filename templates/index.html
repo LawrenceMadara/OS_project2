@@ -17,7 +17,7 @@
 
     <!-- Main Content -->
     <main class="container mx-auto p-6">
-        
+
         <!-- Explore Nutritional Insights Section -->
         <section class="mb-10">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Explore Nutritional Insights</h2>
@@ -56,12 +56,19 @@
         <!-- Filters and Data Interaction -->
         <section class="mb-10">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Filters and Data Interaction</h2>
-            
+
             <div class="flex flex-wrap gap-4 items-center">
-                <input type="text" id="searchInput" placeholder="Search by Diet Type" 
-                       class="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-64">
-                
-                <select id="dietFilter" class="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search by Diet Type"
+                    class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-64"
+                >
+
+                <select
+                    id="dietFilter"
+                    class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
                     <option value="all">All Diet Types</option>
                     <option value="Vegan">Vegan</option>
                     <option value="Keto">Keto</option>
@@ -74,15 +81,26 @@
         <!-- API Data Interaction -->
         <section class="mb-10">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">API Data Interaction</h2>
-            
+
             <div class="flex flex-wrap gap-4">
-                <button id="getNutritionalInsights" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
+                <button
+                    id="getNutritionalInsights"
+                    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+                >
                     Get Nutritional Insights
                 </button>
-                <button id="getRecipes" class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">
+
+                <button
+                    id="getRecipes"
+                    class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition"
+                >
                     Get Recipes
                 </button>
-                <button id="getClusters" class="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition">
+
+                <button
+                    id="getClusters"
+                    class="bg-purple-600 text-white py-2 px-4 rounded hover:bg-purple-700 transition"
+                >
                     Get Clusters
                 </button>
             </div>
@@ -96,37 +114,65 @@
         <!-- Security & Compliance -->
         <section class="mb-10">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Security & Compliance</h2>
-            
+
             <div class="bg-white p-6 shadow-lg rounded-lg">
                 <h3 class="text-lg font-semibold mb-3">Security Status</h3>
                 <div id="securityStatus" class="space-y-1 text-sm">
-                    <p>Encryption: <span class="text-green-600 font-semibold">Enabled</span></p>
-                    <p>Access Control: <span class="text-green-600 font-semibold">Secure</span></p>
-                    <p>Compliance: <span class="text-green-600 font-semibold">GDPR Compliant</span></p>
+                    <p>Encryption: <span class="text-green-600 font-semibold">Enabled (AES-256 at rest, TLS in transit)</span></p>
+                    <p>Access Control: <span class="text-green-600 font-semibold">Role-based access control (RBAC)</span></p>
+                    <p>Compliance: <span class="text-green-600 font-semibold">GDPR &amp; PIPEDA aligned (demo)</span></p>
+                    <p class="text-xs text-gray-500 mt-2">Status: Offline (demo)</p>
                 </div>
             </div>
         </section>
 
         <!-- OAuth & 2FA Integration -->
         <section class="mb-10">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-800">OAuth & 2FA Integration</h2>
-            
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">OAuth &amp; 2FA Integration</h2>
+
             <div class="bg-white p-6 shadow-lg rounded-lg">
                 <h3 class="text-lg font-semibold mb-4">Secure Login</h3>
-                
+
                 <div class="flex flex-wrap gap-4 mb-6">
-                    <button id="loginGoogle" class="bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700 transition">
+                    <button
+                        id="loginGoogle"
+                        class="bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700 transition"
+                    >
                         Login with Google
                     </button>
-                    <button id="loginGitHub" class="bg-gray-800 text-white py-2 px-6 rounded hover:bg-gray-900 transition">
+
+                    <button
+                        id="loginGitHub"
+                        class="bg-gray-800 text-white py-2 px-6 rounded hover:bg-gray-900 transition"
+                    >
                         Login with GitHub
+                    </button>
+
+                    <button
+                        id="logoutBtn"
+                        class="bg-gray-300 text-gray-800 py-2 px-4 rounded hover:bg-gray-400 transition hidden"
+                    >
+                        Logout
                     </button>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-semibold mb-2">Enter 2FA Code</label>
-                    <input type="text" id="twoFactorCode" placeholder="Enter your 2FA code" 
-                           class="p-2 border rounded w-full focus:ring focus:ring-blue-300">
+                <div class="flex flex-wrap gap-4 items-center mb-4">
+                    <input
+                        type="text"
+                        id="otpInput"
+                        placeholder="Enter your 2FA code"
+                        class="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 w-full sm:w-64"
+                    >
+                    <p class="text-xs text-gray-500">
+                        Demo mode: enter any 6-digit code to simulate 2FA verification.
+                    </p>
+                </div>
+
+                <div
+                    id="loginStatus"
+                    class="text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded p-3"
+                >
+                    Not authenticated. Login is required before running cleanup jobs that affect cloud costs.
                 </div>
             </div>
         </section>
@@ -134,33 +180,54 @@
         <!-- Cloud Resource Cleanup -->
         <section class="mb-10">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Cloud Resource Cleanup</h2>
-            
+
             <div class="bg-white p-6 shadow-lg rounded-lg">
-                <p class="text-sm text-gray-700 mb-4">Ensure that cloud resources are efficiently managed and cleaned up post-deployment.</p>
-                
-                <button id="cleanupBtn" class="bg-red-600 text-white py-2 px-6 rounded hover:bg-red-700 transition">
+                <p class="text-sm text-gray-700 mb-4">
+                    Ensure that cloud resources are automatically cleaned up after deployments.
+                    Idle VMs, unused storage, and stale containers are detected and de-provisioned to
+                    reduce monthly costs and improve sustainability.
+                </p>
+
+                <button
+                    id="cleanupBtn"
+                    class="bg-red-600 text-white py-2 px-6 rounded hover:bg-red-700 transition"
+                >
                     Clean Up Resources
                 </button>
 
-                <div id="cleanupStatus" class="mt-4 text-xs text-gray-700 font-mono bg-gray-50 p-3 rounded overflow-y-auto max-h-32 hidden"></div>
+                <div
+                    id="cleanupStatus"
+                    class="mt-4 text-xs text-gray-800 bg-gray-50 p-3 rounded overflow-y-auto max-h-48 hidden"
+                ></div>
+
+                <div
+                    id="economicImpact"
+                    class="mt-4 text-sm text-gray-700 bg-green-50 border border-green-200 rounded p-3 hidden"
+                ></div>
             </div>
         </section>
 
         <!-- Pagination -->
         <section class="mb-10">
             <h2 class="text-2xl font-semibold mb-4 text-gray-800">Pagination</h2>
-            
-            <div class="flex justify-center gap-2">
-                <button class="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition">
+
+            <div class="flex gap-2">
+                <button
+                    class="bg-gray-200 text-gray-700 py-2 px-4 rounded hover:bg-gray-300 transition"
+                >
                     Previous
                 </button>
                 <button class="bg-blue-600 text-white py-2 px-4 rounded">
                     1
                 </button>
-                <button class="bg-gray-200 text-gray-700 py-2 px-4 rounded hover:bg-gray-300 transition">
+                <button
+                    class="bg-gray-200 text-gray-700 py-2 px-4 rounded hover:bg-gray-300 transition"
+                >
                     2
                 </button>
-                <button class="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition">
+                <button
+                    class="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400 transition"
+                >
                     Next
                 </button>
             </div>
@@ -180,7 +247,12 @@
         let socket = null;
         let isInitialized = false;
 
-        // Mock data
+        const authState = {
+            isAuthenticated: false,
+            provider: null
+        };
+
+        // Mock data for charts / API demo
         const mockData = {
             avgMacros: [
                 { Diet_type: 'Vegan', Protein: 15, Carbs: 45, Fat: 12 },
@@ -196,10 +268,18 @@
             ]
         };
 
+        // Mock cloud resources for economic impact
+        const cloudResources = [
+            { name: 'dev-vm-1',       type: 'VM',       monthlyCost: 25, utilization: 0.15 },
+            { name: 'staging-vm-2',   type: 'VM',       monthlyCost: 40, utilization: 0.30 },
+            { name: 'temp-storage',   type: 'Storage',  monthlyCost: 15, utilization: 0.10 },
+            { name: 'old-container',  type: 'Container',monthlyCost: 20, utilization: 0.05 }
+        ];
+
         let charts = {};
 
         // ============================================
-        // SOCKET.IO SETUP
+        // SOCKET.IO SETUP  (used only for status demo)
         // ============================================
         function initSocket() {
             try {
@@ -250,15 +330,24 @@
 
         function updateSecurityStatus(status, color) {
             const statusDiv = document.getElementById('securityStatus');
-            if (statusDiv) {
-                const colorClass = color === 'green' ? 'text-green-600' : color === 'yellow' ? 'text-yellow-600' : 'text-red-600';
-                statusDiv.innerHTML = `
-                    <p>Encryption: <span class="${colorClass} font-semibold">Enabled</span></p>
-                    <p>Access Control: <span class="${colorClass} font-semibold">Secure</span></p>
-                    <p>Compliance: <span class="${colorClass} font-semibold">GDPR Compliant</span></p>
-                    <p class="text-xs text-gray-500 mt-2">Status: ${status}</p>
-                `;
-            }
+            if (!statusDiv) return;
+
+            let colorClass = 'text-gray-600';
+            if (color === 'green') colorClass = 'text-green-600';
+            else if (color === 'yellow') colorClass = 'text-yellow-600';
+            else if (color === 'red') colorClass = 'text-red-600';
+
+            const authText = authState.isAuthenticated
+                ? `Authenticated via ${authState.provider} with 2FA`
+                : 'Anonymous access (limited features)';
+
+            statusDiv.innerHTML = `
+                <p>Encryption: <span class="${colorClass} font-semibold">Enabled (AES-256 at rest, TLS in transit)</span></p>
+                <p>Access Control: <span class="${colorClass} font-semibold">RBAC + 2FA (demo)</span></p>
+                <p>Compliance: <span class="${colorClass} font-semibold">GDPR &amp; PIPEDA aligned (demo)</span></p>
+                <p>User: <span class="${colorClass} font-semibold">${authText}</span></p>
+                <p class="text-xs text-gray-500 mt-2">Status: ${status}</p>
+            `;
         }
 
         // ============================================
@@ -274,19 +363,24 @@
                 type: 'bar',
                 data: {
                     labels: mockData.avgMacros.map(d => d.Diet_type),
-                    datasets: [{
-                        label: 'Protein (g)',
-                        data: mockData.avgMacros.map(d => d.Protein),
-                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 1
-                    }]
+                    datasets: [
+                        {
+                            label: 'Protein (g)',
+                            data: mockData.avgMacros.map(d => d.Protein)
+                        },
+                        {
+                            label: 'Carbs (g)',
+                            data: mockData.avgMacros.map(d => d.Carbs)
+                        },
+                        {
+                            label: 'Fat (g)',
+                            data: mockData.avgMacros.map(d => d.Fat)
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+                    maintainAspectRatio: false
                 }
             });
         }
@@ -300,19 +394,15 @@
             charts.scatter = new Chart(ctx, {
                 type: 'scatter',
                 data: {
-                    datasets: [{
-                        label: 'Protein vs Carbs',
-                        data: mockData.avgMacros.map(d => ({ x: d.Carbs, y: d.Protein })),
-                        backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                        borderColor: 'rgba(34, 197, 94, 1)',
-                        borderWidth: 1
-                    }]
+                    datasets: mockData.avgMacros.map(diet => ({
+                        label: diet.Diet_type,
+                        data: [{ x: diet.Carbs, y: diet.Protein }]
+                    }))
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
+                    scales: {
                         x: { title: { display: true, text: 'Carbs (g)' } },
                         y: { title: { display: true, text: 'Protein (g)' } }
                     }
@@ -332,27 +422,14 @@
                     labels: mockData.avgMacros.map(d => d.Diet_type),
                     datasets: [
                         {
-                            label: 'Protein',
-                            data: mockData.avgMacros.map(d => d.Protein),
-                            backgroundColor: 'rgba(34, 139, 34, 0.7)'
-                        },
-                        {
-                            label: 'Carbs',
-                            data: mockData.avgMacros.map(d => d.Carbs),
-                            backgroundColor: 'rgba(255, 159, 64, 0.7)'
-                        },
-                        {
-                            label: 'Fat',
-                            data: mockData.avgMacros.map(d => d.Fat),
-                            backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                            label: 'Macro Density (Protein + Carbs + Fat)',
+                            data: mockData.avgMacros.map(d => d.Protein + d.Carbs + d.Fat)
                         }
                     ]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: true, position: 'bottom' } },
-                    scales: { y: { beginAtZero: true } }
+                    maintainAspectRatio: false
                 }
             });
         }
@@ -393,6 +470,104 @@
         }
 
         // ============================================
+        // AUTHENTICATION (DEMO: OAuth + 2FA)
+        // ============================================
+        function handleLogin(provider) {
+            const otpInput = document.getElementById('otpInput');
+            const statusDiv = document.getElementById('loginStatus');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            const code = (otpInput.value || '').trim();
+
+            if (code.length < 6) {
+                statusDiv.textContent = '2FA failed: please enter a 6-digit code (demo check).';
+                statusDiv.className = 'text-sm text-red-700 bg-red-50 border border-red-200 rounded p-3';
+                authState.isAuthenticated = false;
+                authState.provider = null;
+                updateSecurityStatus('Authentication failed', 'red');
+                return;
+            }
+
+            authState.isAuthenticated = true;
+            authState.provider = provider;
+
+            statusDiv.textContent = `Authenticated with ${provider} and 2FA (simulated). Sensitive API calls and cloud cleanup are now enabled.`;
+            statusDiv.className = 'text-sm text-green-700 bg-green-50 border border-green-200 rounded p-3';
+
+            logoutBtn.classList.remove('hidden');
+
+            updateSecurityStatus('Authenticated', 'green');
+        }
+
+        function handleLogout() {
+            const statusDiv = document.getElementById('loginStatus');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            authState.isAuthenticated = false;
+            authState.provider = null;
+
+            statusDiv.textContent = 'Logged out. Limited, read-only mode. Login again to run cleanup jobs.';
+            statusDiv.className = 'text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded p-3';
+
+            logoutBtn.classList.add('hidden');
+
+            updateSecurityStatus('Guest mode', 'yellow');
+        }
+
+        // ============================================
+        // CLOUD CLEANUP & ECONOMIC IMPACT
+        // ============================================
+        function runCleanup() {
+            const cleanupDiv = document.getElementById('cleanupStatus');
+            const impactDiv = document.getElementById('economicImpact');
+
+            cleanupDiv.classList.remove('hidden');
+            cleanupDiv.innerHTML = '<p>⏳ Starting cleanup...</p>';
+            impactDiv.classList.add('hidden');
+            impactDiv.innerHTML = '';
+
+            if (!authState.isAuthenticated) {
+                cleanupDiv.innerHTML += '<p class="text-red-600 mt-2">❌ Cleanup blocked: please authenticate with OAuth + 2FA first.</p>';
+                return;
+            }
+
+            const steps = [
+                '🔍 Scanning projects for idle VMs, disks, and containers…',
+                '🧹 Stopping long-running dev VMs not used in 7+ days…',
+                '🗑️ Deleting temporary storage buckets and stale container images…',
+                '✅ Cleanup complete. Generating economic impact report…'
+            ];
+
+            steps.forEach((step, idx) => {
+                setTimeout(() => {
+                    cleanupDiv.innerHTML += `<p>${step}</p>`;
+                    cleanupDiv.scrollTop = cleanupDiv.scrollHeight;
+                }, (idx + 1) * 700);
+            });
+
+            // After final step, calculate cost savings
+            setTimeout(() => {
+                const totalMonthlyCost = cloudResources
+                    .reduce((sum, r) => sum + r.monthlyCost, 0);
+
+                const wastedMonthlyCost = cloudResources
+                    .reduce((sum, r) => sum + r.monthlyCost * (1 - r.utilization), 0);
+
+                const annualSavings = wastedMonthlyCost * 12;
+
+                impactDiv.classList.remove('hidden');
+                impactDiv.innerHTML = `
+                    <p><strong>Estimated Monthly Savings:</strong> $${wastedMonthlyCost.toFixed(2)} CAD</p>
+                    <p><strong>Estimated Annual Savings:</strong> $${annualSavings.toFixed(2)} CAD</p>
+                    <p class="mt-1 text-xs text-gray-600">
+                        Assumes removal of idle resources and consolidation of low-utilization workloads.
+                        In a real deployment these numbers would come from cloud billing APIs.
+                    </p>
+                `;
+            }, (steps.length + 1) * 700);
+        }
+
+        // ============================================
         // EVENT HANDLERS
         // ============================================
         document.getElementById('getNutritionalInsights').addEventListener('click', () => {
@@ -413,36 +588,20 @@
             const apiDiv = document.getElementById('apiResponse');
             const contentDiv = document.getElementById('apiContent');
             apiDiv.classList.remove('hidden');
-            contentDiv.textContent = JSON.stringify({ clusters: 4, method: 'K-Means' }, null, 2);
+            contentDiv.textContent = JSON.stringify({ clusters: 4, method: 'K-Means (demo)' }, null, 2);
         });
 
-        document.getElementById('cleanupBtn').addEventListener('click', () => {
-            const cleanupDiv = document.getElementById('cleanupStatus');
-            cleanupDiv.classList.remove('hidden');
-            cleanupDiv.innerHTML = '<p>⏳ Starting cleanup...</p>';
-            
-            const steps = [
-                '🔄 Scanning resources...',
-                '🧹 Removing temporary files...',
-                '🗑️ Clearing cache...',
-                '✅ Cleanup complete!'
-            ];
-
-            steps.forEach((step, idx) => {
-                setTimeout(() => {
-                    cleanupDiv.innerHTML += `<p>${step}</p>`;
-                    cleanupDiv.scrollTop = cleanupDiv.scrollHeight;
-                }, (idx + 1) * 1000);
-            });
-        });
+        document.getElementById('cleanupBtn').addEventListener('click', runCleanup);
 
         document.getElementById('loginGoogle').addEventListener('click', () => {
-            alert('Google OAuth login initiated (demo mode)');
+            handleLogin('Google');
         });
 
         document.getElementById('loginGitHub').addEventListener('click', () => {
-            alert('GitHub OAuth login initiated (demo mode)');
+            handleLogin('GitHub');
         });
+
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
         document.getElementById('dietFilter').addEventListener('change', (e) => {
             console.log('Filter changed to:', e.target.value);
@@ -461,16 +620,15 @@
 
             initSocket();
             initCharts();
-            updateSecurityStatus('Initializing...', 'yellow');
-            
+            updateSecurityStatus('Initializing…', 'yellow');
+
             setTimeout(() => {
                 updateSecurityStatus('Active', 'green');
             }, 1000);
         });
 
-        // Real-time updates simulation
+        // Simulated real-time updates
         setInterval(() => {
-            // Simulate real-time data updates
             if (Math.random() > 0.7) {
                 console.log('🔄 Real-time update received');
             }
