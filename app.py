@@ -67,7 +67,7 @@ oauth.register(
 )
 
 # -------------------------------------------------------------------
-# Basic routes
+# Routes
 # -------------------------------------------------------------------
 @app.route("/")
 def index():
@@ -75,9 +75,7 @@ def index():
     return render_template("index.html")
 
 
-# ---------------------- Authentication Routes ----------------------
-
-
+# ---------- Authentication ----------
 @app.route("/login/<provider>")
 def login(provider):
     """Start OAuth login with Google or GitHub."""
@@ -144,15 +142,14 @@ def logout():
     return redirect(url_for("index"))
 
 
-# -------------------------------------------------------------------
-# Real-Time Nutritional Analysis (Socket.IO)
-# -------------------------------------------------------------------
+# ---------- Real-Time Nutritional Analysis (Socket.IO) ----------
 @socketio.on("start_analysis")
 def handle_start_analysis():
     """Send live updates during analysis."""
     emit("progress", {"status": "Loading dataset..."})
     time.sleep(1)
 
+    # C:\OS_project2\res\All_Diets.csv  (relative path)
     df = load_dataset("res/All_Diets.csv")
     df = clean_macronutrients(df)
     emit("progress", {"status": "Calculating averages..."})
@@ -185,9 +182,7 @@ def handle_start_analysis():
     )
 
 
-# -------------------------------------------------------------------
-# Simple Recipe Search API
-# -------------------------------------------------------------------
+# ---------- Simple Recipe Search API ----------
 RECIPES = {
     "chicken": {
         "title": "Simple Baked Chicken Breast",
@@ -254,7 +249,6 @@ def get_recipe():
     if not query:
         return jsonify({"found": False, "message": "Please type a food name."})
 
-    # basic keyword match
     for keyword, recipe in RECIPES.items():
         if keyword in query:
             return jsonify({"found": True, "recipe": recipe})
@@ -266,5 +260,6 @@ def get_recipe():
 # Start app
 # -------------------------------------------------------------------
 if __name__ == "__main__":
-    # In Azure you usually run via gunicorn, but this works locally
-    socketio.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    # IMPORTANT for Azure: bind to PORT env (usually 8000)
+    port = int(os.environ.get("PORT", 8000))
+    socketio.run(app, host="0.0.0.0", port=port)
